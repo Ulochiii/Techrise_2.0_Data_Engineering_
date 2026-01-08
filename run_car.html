@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rehoboth DotCom Ventures | Rental & Telematics OS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Utilities */
+        .step-hidden { display: none; }
+        .animate-fade-in { animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Scrollbar */
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Ash & White Palette */
+        .bg-ash-base { background-color: #f8fafc; } /* Slate-50 */
+        .bg-ash-surface { background-color: #ffffff; }
+        .bg-ash-sidebar { background-color: #1e293b; } /* Slate-800 */
+        .border-ash { border-color: #e2e8f0; } /* Slate-200 */
+        .text-ash-primary { color: #0f172a; } /* Slate-900 */
+        .text-ash-secondary { color: #64748b; } /* Slate-500 */
+        
+        /* Interactive */
+        .nav-item-active { background-color: rgba(255, 255, 255, 0.1); color: #ffffff; border-left: 3px solid #3b82f6; }
+    </style>
+</head>
+<body class="min-h-screen bg-ash-base text-ash-primary overflow-hidden">
+
+    <!-- Global Interface Switcher (Floating) -->
+    <div class="fixed bottom-6 right-6 z-50 flex p-1 bg-white rounded-full shadow-2xl border border-ash">
+        <button onclick="switchInterface('customer')" id="btn-switch-customer" class="px-5 py-2.5 rounded-full text-xs font-bold transition-all bg-ash-sidebar text-white shadow-md">Customer App</button>
+        <button onclick="switchInterface('user')" id="btn-switch-user" class="px-5 py-2.5 rounded-full text-xs font-bold transition-all text-ash-secondary hover:bg-gray-50">KYC Portal</button>
+        <button onclick="switchInterface('admin')" id="btn-switch-admin" class="px-5 py-2.5 rounded-full text-xs font-bold transition-all text-ash-secondary hover:bg-gray-50">Admin HQ</button>
+    </div>
+
+    <!-- =========================== -->
+    <!--    CUSTOMER PORTAL (NEW)    -->
+    <!-- =========================== -->
+    <div id="customer-portal" class="h-screen flex flex-col animate-fade-in overflow-hidden bg-ash-base">
+        <!-- Customer Nav -->
+        <nav class="w-full bg-white border-b border-ash px-6 py-4 flex justify-between items-center sticky top-0 z-20">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 text-white p-2 rounded-xl shadow-lg">
+                    <i data-lucide="car" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-ash-primary">Rehoboth Ride</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <button class="text-sm font-bold text-ash-secondary hover:text-ash-primary">My Trips</button>
+                <div class="w-8 h-8 rounded-full bg-ash-base flex items-center justify-center border border-ash">
+                    <i data-lucide="user" class="w-4 h-4 text-ash-secondary"></i>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex h-full">
+            <!-- Left Panel: Booking & Registration -->
+            <aside class="w-[400px] bg-white border-r border-ash flex flex-col p-6 overflow-y-auto custom-scroll shadow-xl z-10">
+                
+                <!-- Registration View -->
+                <div id="cust-view-register" class="space-y-6">
+                    <div class="space-y-2">
+                        <h1 class="text-2xl font-black text-ash-primary">Create Account</h1>
+                        <p class="text-sm text-ash-secondary">Join thousands of riders.</p>
+                    </div>
+                    <form onsubmit="event.preventDefault(); showCustomerView('booking');" class="space-y-4">
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-ash-secondary ml-1">FULL NAME</label>
+                            <input type="text" required class="w-full p-3 bg-ash-base border border-ash rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="Enter your name">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-ash-secondary ml-1">EMAIL</label>
+                            <input type="email" required class="w-full p-3 bg-ash-base border border-ash rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="name@example.com">
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-xs font-bold text-ash-secondary ml-1">PASSWORD</label>
+                            <input type="password" required class="w-full p-3 bg-ash-base border border-ash rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition-all" placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="w-full py-4 bg-ash-sidebar text-white rounded-xl font-bold shadow-lg hover:shadow-xl transition-all flex justify-center items-center gap-2">
+                            <span>Register & Ride</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </form>
+                    <p class="text-xs text-center text-ash-secondary">Already have an account? <a href="#" onclick="showCustomerView('booking')" class="text-blue-600 font-bold hover:underline">Log in</a></p>
+                </div>
+
+                <!-- Booking View (Hidden initially) -->
+                <div id="cust-view-booking" class="hidden space-y-6 animate-fade-in">
+                    <div class="space-y-2">
+                        <h1 class="text-2xl font-black text-ash-primary">Book a Ride</h1>
+                        <p class="text-sm text-ash-secondary">Where are you going today?</p>
+                    </div>
+
+                    <!-- Location Inputs -->
+                    <div class="space-y-4 relative">
+                        <!-- Connecting Line -->
+                        <div class="absolute left-4 top-10 bottom-10 w-0.5 bg-ash-base -z-10"></div>
+                        
+                        <div class="group">
+                            <label class="text-[10px] font-bold text-blue-600 uppercase ml-1 mb-1 block">Pickup</label>
+                            <div class="relative">
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-600 ring-4 ring-blue-50"></div>
+                                <input type="text" id="pickup-loc" value="Current Location" class="w-full pl-10 p-3 bg-ash-base border border-ash rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
+                        </div>
+
+                        <div class="group">
+                            <label class="text-[10px] font-bold text-ash-primary uppercase ml-1 mb-1 block">Destination</label>
+                            <div class="relative">
+                                <div class="absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-sm bg-ash-primary ring-4 ring-gray-100"></div>
+                                <input type="text" id="dropoff-loc" placeholder="Where to?" class="w-full pl-10 p-3 bg-white border border-ash rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-ash-sidebar shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Selection -->
+                    <div class="space-y-3">
+                        <label class="text-xs font-bold text-ash-secondary ml-1">SELECT VEHICLE</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div onclick="selectVehicle(this)" class="p-3 border-2 border-blue-600 bg-blue-50 rounded-xl cursor-pointer transition-all hover:shadow-md">
+                                <i data-lucide="car" class="w-6 h-6 text-blue-600 mb-2"></i>
+                                <p class="text-xs font-bold text-ash-primary">Standard</p>
+                                <p class="text-[10px] text-ash-secondary">Toyota Corolla</p>
+                                <p class="text-xs font-bold text-ash-primary mt-1">₦45k/day</p>
+                            </div>
+                            <div onclick="selectVehicle(this)" class="p-3 border border-ash bg-white rounded-xl cursor-pointer transition-all hover:border-ash-sidebar hover:shadow-md">
+                                <i data-lucide="gem" class="w-6 h-6 text-ash-secondary mb-2"></i>
+                                <p class="text-xs font-bold text-ash-primary">Premium</p>
+                                <p class="text-[10px] text-ash-secondary">Lexus ES350</p>
+                                <p class="text-xs font-bold text-ash-primary mt-1">₦80k/day</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-ash">
+                        <button onclick="confirmBooking()" class="w-full py-4 bg-ash-sidebar text-white rounded-xl font-bold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex justify-between px-6 items-center">
+                            <span>Confirm Booking</span>
+                            <span class="bg-white/20 px-2 py-1 rounded text-xs">₦45,000</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Booking Success (Hidden) -->
+                <div id="cust-view-success" class="hidden h-full flex flex-col justify-center items-center text-center animate-fade-in">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                        <i data-lucide="check" class="w-8 h-8 text-green-600"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-ash-primary">Booking Confirmed!</h2>
+                    <p class="text-sm text-ash-secondary mt-2 mb-6">Your ride is scheduled. Driver details sent.</p>
+                    <button onclick="showCustomerView('booking')" class="text-blue-600 font-bold text-sm hover:underline">Book Another Ride</button>
+                </div>
+
+            </aside>
+
+            <!-- Right Panel: Live Map -->
+            <main class="flex-1 bg-ash-base relative">
+                <!-- Map Background Simulation -->
+                <div class="absolute inset-0 bg-slate-200">
+                    <div class="absolute inset-0" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 20px 20px;"></div>
+                    
+                    <!-- Map Elements -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-400 font-bold text-2xl opacity-20 pointer-events-none select-none">
+                        LIVE MAP VIEW
+                    </div>
+
+                    <!-- Pickup Pin -->
+                    <div class="absolute top-[40%] left-[45%] flex flex-col items-center animate-bounce">
+                        <div class="bg-ash-sidebar text-white text-[10px] font-bold px-2 py-1 rounded shadow mb-1">You</div>
+                        <div class="w-4 h-4 bg-blue-600 rounded-full border-2 border-white shadow-lg"></div>
+                    </div>
+
+                    <!-- Car Pins (Simulated) -->
+                    <div class="absolute top-[30%] left-[60%]">
+                        <i data-lucide="car" class="w-6 h-6 text-ash-sidebar fill-ash-sidebar"></i>
+                    </div>
+                    <div class="absolute top-[55%] left-[30%]">
+                        <i data-lucide="car" class="w-6 h-6 text-ash-secondary"></i>
+                    </div>
+                </div>
+
+                <!-- Map Controls -->
+                <div class="absolute bottom-8 right-8 flex flex-col gap-2">
+                    <button type="button" title="Center map" class="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center border border-ash hover:bg-gray-50"><i data-lucide="crosshair" class="w-5 h-5 text-ash-secondary"></i></button>
+                    <button type="button" title="Zoom in" class="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center border border-ash hover:bg-gray-50"><i data-lucide="plus" class="w-5 h-5 text-ash-secondary"></i></button>
+                    <button type="button" title="Zoom out" class="w-10 h-10 bg-white rounded-lg shadow-lg flex items-center justify-center border border-ash hover:bg-gray-50"><i data-lucide="minus" class="w-5 h-5 text-ash-secondary"></i></button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- =========================== -->
+    <!--      USER PORTAL (APP)      -->
+    <!-- =========================== -->
+    <div id="user-portal" class="h-screen hidden flex-col animate-fade-in overflow-y-auto custom-scroll">
+        <nav class="w-full bg-ash-surface border-b border-ash px-6 py-4 flex justify-between items-center sticky top-0 z-20">
+            <div class="flex items-center gap-3">
+                <div class="bg-ash-sidebar text-white p-2 rounded-xl shadow-lg">
+                    <i data-lucide="layers" class="w-5 h-5"></i>
+                </div>
+                <span class="font-bold text-lg tracking-tight text-ash-primary">Rehoboth DotCom Ventures</span>
+            </div>
+            <div class="text-xs font-semibold text-ash-secondary bg-ash-base px-3 py-1.5 rounded-lg border border-ash">
+                <span class="w-2 h-2 bg-green-500 rounded-full inline-block mr-1"></span> System Online
+            </div>
+        </nav>
+
+        <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-10">
+            <!-- Stepper -->
+            <div class="flex justify-between items-center max-w-xl mx-auto mb-12 relative">
+                <div class="absolute top-1/2 left-0 w-full h-0.5 bg-ash-base -z-10 -translate-y-1/2"></div>
+                <!-- Steps dynamically handled by JS -->
+                <div id="step-1-dot" class="w-8 h-8 rounded-full bg-ash-sidebar text-white flex items-center justify-center text-xs font-bold ring-4 ring-white shadow-sm transition-all">1</div>
+                <div id="step-2-dot" class="w-8 h-8 rounded-full bg-white text-ash-secondary border border-ash flex items-center justify-center text-xs font-bold transition-all">2</div>
+                <div id="step-3-dot" class="w-8 h-8 rounded-full bg-white text-ash-secondary border border-ash flex items-center justify-center text-xs font-bold transition-all">3</div>
+                <div id="step-4-dot" class="w-8 h-8 rounded-full bg-white text-ash-secondary border border-ash flex items-center justify-center text-xs font-bold transition-all">4</div>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Main Form Card -->
+                <div class="lg:col-span-7 bg-ash-surface p-8 md:p-10 rounded-[2rem] shadow-xl border border-ash min-h-[500px] relative overflow-hidden">
+                    
+                    <!-- STEP 1: GLOBAL PHONE VERIFICATION -->
+                    <div id="user-step-1" class="space-y-8 animate-fade-in">
+                        <div>
+                            <h1 class="text-3xl font-black text-ash-primary tracking-tight mb-2">Welcome</h1>
+                            <p class="text-ash-secondary">Verify your mobile number to access the fleet.</p>
+                        </div>
+
+                        <div class="space-y-5">
+                            <!-- Country Dropdown -->
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-ash-secondary uppercase tracking-widest ml-1">Country Code</label>
+                                <div class="relative">
+                                    <i data-lucide="globe" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ash-secondary"></i>
+                                    <select id="country-selector" onchange="updateCountryCode()" class="custom-scroll w-full pl-12 pr-4 py-4 bg-ash-base border border-ash rounded-2xl focus:ring-2 focus:ring-ash-sidebar outline-none appearance-none text-sm font-medium transition-shadow cursor-pointer">
+                                        <!-- JS will populate 195 countries here -->
+                                        <option value="">Loading Countries...</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ash-secondary pointer-events-none"></i>
+                                </div>
+                            </div>
+
+                            <!-- Phone Input -->
+                            <div class="relative group">
+                                <div class="absolute left-5 top-1/2 -translate-y-1/2 flex items-center gap-3 border-r border-ash pr-4">
+                                    <span id="display-call-code" class="font-bold text-ash-primary text-lg">+234</span>
+                                </div>
+                                <input type="tel" id="user-phone-input" placeholder="800 000 0000" class="w-full pl-28 pr-6 py-4 bg-ash-base border border-ash rounded-2xl focus:ring-2 focus:ring-ash-sidebar outline-none text-lg font-medium transition-all">
+                            </div>
+                        </div>
+
+                        <!-- OTP Section (Hidden initially) -->
+                        <div id="user-otp-box" class="hidden animate-fade-in pt-6 border-t border-ash/50">
+                            <div class="flex justify-between items-center mb-3">
+                                <label class="text-xs font-bold text-ash-primary">Enter Code</label>
+                                <span id="user-otp-hint" class="text-[10px] font-mono text-blue-600 bg-blue-50 px-2 py-1 rounded"></span>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="user-otp-input" placeholder="000 000" class="w-full py-4 text-center bg-ash-base border border-ash rounded-2xl text-2xl font-black tracking-widest focus:border-ash-sidebar outline-none">
+                            </div>
+                        </div>
+
+                        <button onclick="handleUserPhone()" id="user-btn-phone" class="w-full py-5 bg-ash-sidebar text-white rounded-2xl font-bold text-sm shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                            <span>Send Verification Code</span> <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- STEP 2: PROFILE & ADDRESS -->
+                    <div id="user-step-2" class="step-hidden space-y-6 animate-fade-in">
+                        <h2 class="text-2xl font-bold text-ash-primary">Identity Details</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" placeholder="First Name" class="w-full p-4 bg-ash-base border border-ash rounded-2xl outline-none focus:border-ash-sidebar">
+                            <input type="text" placeholder="Last Name" class="w-full p-4 bg-ash-base border border-ash rounded-2xl outline-none focus:border-ash-sidebar">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-ash-secondary ml-1">RESIDENTIAL ADDRESS</label>
+                            <textarea id="user-address" rows="3" placeholder="Full address for delivery verification" class="w-full p-4 bg-ash-base border border-ash rounded-2xl outline-none resize-none focus:border-ash-sidebar"></textarea>
+                        </div>
+
+                        <button onclick="goToUserStep(3)" class="w-full py-5 bg-ash-sidebar text-white rounded-2xl font-bold">Continue</button>
+                    </div>
+
+                    <!-- STEP 3: KYC UPLOAD -->
+                    <div id="user-step-3" class="step-hidden space-y-6 animate-fade-in">
+                        <h2 class="text-2xl font-bold text-ash-primary">Document Scan</h2>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="selectDoc('NIN')" class="doc-btn p-3 border border-ash rounded-xl text-[10px] font-bold text-ash-secondary bg-ash-base hover:bg-white hover:shadow-md transition-all">NIN</button>
+                            <button onclick="selectDoc('Passport')" class="doc-btn p-3 border border-ash rounded-xl text-[10px] font-bold text-ash-secondary bg-ash-base hover:bg-white hover:shadow-md transition-all">Passport</button>
+                            <button onclick="selectDoc('License')" class="doc-btn p-3 border border-ash rounded-xl text-[10px] font-bold text-ash-secondary bg-ash-base hover:bg-white hover:shadow-md transition-all">License</button>
+                        </div>
+                        
+                        <div onclick="document.getElementById('gallery-input').click()" class="border-2 border-dashed border-ash rounded-3xl h-48 flex flex-col items-center justify-center cursor-pointer hover:bg-ash-base transition-colors group">
+                            <input type="file" id="gallery-input" class="hidden" accept="image/*" onchange="handleFileSelected(this)">
+                            <div id="upload-content" class="text-center group-hover:scale-105 transition-transform">
+                                <i data-lucide="scan-face" class="w-10 h-10 text-ash-secondary mx-auto mb-3"></i>
+                                <p class="text-sm font-medium text-ash-primary">Tap to select from Gallery</p>
+                            </div>
+                        </div>
+
+                        <button onclick="goToUserStep(4)" id="doc-next-btn" class="w-full py-5 bg-ash-sidebar text-white rounded-2xl font-bold opacity-50 pointer-events-none">Analyze & Verify</button>
+                    </div>
+
+                    <!-- STEP 4: PAYMENT -->
+                    <div id="user-step-4" class="step-hidden space-y-6 animate-fade-in">
+                        <h2 class="text-2xl font-bold text-ash-primary">Rental Summary</h2>
+                        <div class="bg-ash-base p-6 rounded-3xl border border-ash space-y-4">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="font-bold text-lg">Toyota Corolla</p>
+                                    <p class="text-xs text-ash-secondary">Standard Plan</p>
+                                </div>
+                                <span class="font-black text-xl">₦45,000</span>
+                            </div>
+                            <div class="h-px bg-ash-secondary/20"></div>
+                            <div class="flex justify-between text-xs text-ash-secondary">
+                                <span>Delivery to:</span>
+                                <span id="summary-address" class="font-bold text-ash-primary text-right max-w-[150px] truncate">...</span>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-ash-sidebar text-white rounded-2xl shadow-lg relative overflow-hidden">
+                            <i data-lucide="wallet" class="absolute -bottom-4 -right-4 w-24 h-24 opacity-10"></i>
+                            <p class="text-[10px] uppercase font-bold text-gray-400 mb-1">Escrow Account (Sterling)</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-2xl font-mono tracking-wider">0129485734</p>
+                                <button onclick="copyAccount()" class="p-2 bg-white/10 rounded-lg hover:bg-white/20"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <button onclick="triggerPayment()" id="btn-pay" class="w-full py-5 bg-ash-sidebar text-white rounded-2xl font-bold flex items-center justify-center gap-2">
+                            <span>Confirm Transfer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Side Info -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="bg-white p-8 rounded-[2rem] border border-ash shadow-lg text-center">
+                        <div id="status-idle">
+                            <div class="w-16 h-16 bg-ash-base rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="shield" class="w-8 h-8 text-ash-primary"></i>
+                            </div>
+                            <h3 class="font-bold text-lg">Identity Vault</h3>
+                            <p class="text-sm text-ash-secondary mt-2">Your data is encrypted and cross-referenced with Cartrack's driver database.</p>
+                        </div>
+                        <div id="status-loading" class="hidden">
+                            <div class="w-16 h-16 border-4 border-ash-sidebar border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                            <h3 class="font-bold text-lg animate-pulse">Verifying...</h3>
+                            <p class="text-xs text-ash-secondary mt-2">Checking Global Registry</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- =========================== -->
+    <!--      ADMIN PORTAL (HQ)      -->
+    <!-- =========================== -->
+    <div id="admin-portal" class="h-screen hidden flex bg-ash-base animate-fade-in overflow-hidden">
+        
+        <!-- Sidebar -->
+        <aside class="w-72 bg-ash-sidebar text-slate-400 flex flex-col p-6 border-r border-slate-700">
+            <div class="flex items-center gap-3 text-white mb-10 px-2">
+                <div class="bg-blue-600 p-1.5 rounded-lg"><i data-lucide="command" class="w-5 h-5"></i></div>
+                <span class="font-bold text-xl tracking-tight">Rehoboth DotCom Ventures</span>
+            </div>
+            
+            <nav class="flex-1 space-y-1">
+                <div class="text-[10px] font-bold uppercase tracking-widest mb-4 ml-3 text-slate-500">Telematics</div>
+                <a href="#" onclick="showAdminTab('tracking')" class="admin-nav-link flex items-center gap-3 p-3.5 rounded-xl bg-slate-700/50 text-white border border-slate-600">
+                    <i data-lucide="map" class="w-4 h-4 text-blue-400"></i> <span>Live Fleet Map</span>
+                </a>
+                <a href="#" class="admin-nav-link flex items-center gap-3 p-3.5 rounded-xl hover:text-white transition-colors">
+                    <i data-lucide="alert-triangle" class="w-4 h-4"></i> <span>Alerts & Events</span>
+                </a>
+
+                <div class="text-[10px] font-bold uppercase tracking-widest mt-8 mb-4 ml-3 text-slate-500">Business Logic</div>
+                <a href="#" class="admin-nav-link flex items-center gap-3 p-3.5 rounded-xl hover:text-white transition-colors">
+                    <i data-lucide="calendar" class="w-4 h-4"></i> <span>Bookings</span>
+                </a>
+                <a href="#" class="admin-nav-link flex items-center gap-3 p-3.5 rounded-xl hover:text-white transition-colors">
+                    <i data-lucide="credit-card" class="w-4 h-4"></i> <span>Payments & Ledger</span>
+                </a>
+                <a href="#" class="admin-nav-link flex items-center gap-3 p-3.5 rounded-xl hover:text-white transition-colors">
+                    <i data-lucide="users" class="w-4 h-4"></i> <span>KYC Database</span>
+                </a>
+            </nav>
+
+            <div class="mt-auto bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold text-white">Cartrack API</span>
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                </div>
+                <p class="text-[10px] leading-relaxed">Stream OK. 24/24 Units Online.</p>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto custom-scroll p-8">
+            <header class="flex justify-between items-end mb-8">
+                <div>
+                    <h1 class="text-3xl font-black text-ash-primary tracking-tight">Operations Center</h1>
+                    <p class="text-ash-secondary text-sm font-medium mt-1">Real-time fusion of GPS data and Rental Contracts.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button class="bg-white border border-ash text-ash-secondary px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 shadow-sm hover:bg-ash-base">
+                        <i data-lucide="download" class="w-4 h-4"></i> Report
+                    </button>
+                    <button class="bg-ash-sidebar text-white px-5 py-2.5 rounded-xl text-xs font-bold shadow-lg flex items-center gap-2">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add Vehicle
+                    </button>
+                </div>
+            </header>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-3xl border border-ash shadow-sm">
+                    <p class="text-[10px] font-bold text-ash-secondary uppercase mb-1">Fleet Revenue</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-black text-ash-primary">₦4.2M</span>
+                        <span class="text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded">+8%</span>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-ash shadow-sm">
+                    <p class="text-[10px] font-bold text-ash-secondary uppercase mb-1">Active Rentals</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-black text-ash-primary">18</span>
+                        <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">75% Util</span>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-ash shadow-sm">
+                    <p class="text-[10px] font-bold text-ash-secondary uppercase mb-1">Safety Alerts</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-black text-ash-primary">3</span>
+                        <span class="text-[10px] font-bold text-orange-600 bg-orange-50 px-2 py-1 rounded">Overspeed</span>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-3xl border border-ash shadow-sm">
+                    <p class="text-[10px] font-bold text-ash-secondary uppercase mb-1">Maintenance</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-black text-ash-primary">2</span>
+                        <span class="text-[10px] font-bold text-ash-secondary bg-ash-base px-2 py-1 rounded">Scheduled</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-8 h-[500px]">
+                <!-- Live Map Container (Simulation) -->
+                <div class="col-span-2 bg-white rounded-[2.5rem] border border-ash shadow-md overflow-hidden relative flex flex-col">
+                    <div class="absolute top-6 left-6 z-10 flex gap-2">
+                        <div class="bg-white/90 backdrop-blur p-2 rounded-xl shadow-sm border border-ash text-xs font-bold text-ash-primary flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Live GPS
+                        </div>
+                    </div>
+                    
+                    <!-- Fake Map Background -->
+                    <div class="flex-1 bg-slate-100 relative group cursor-crosshair">
+                        <!-- Grid Lines -->
+                        <div class="absolute inset-0" style="background-image: linear-gradient(#e2e8f0 1px, transparent 1px), linear-gradient(90deg, #e2e8f0 1px, transparent 1px); background-size: 40px 40px;"></div>
+                        
+                        <!-- Vehicle Pins -->
+                        <div class="absolute top-1/3 left-1/4 transform hover:scale-110 transition-transform cursor-pointer">
+                            <div class="relative">
+                                <div class="w-8 h-8 bg-ash-sidebar rounded-full flex items-center justify-center text-white shadow-xl border-2 border-white"><i data-lucide="car" class="w-4 h-4"></i></div>
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-lg border border-ash text-[10px] font-bold whitespace-nowrap hidden group-hover:block">
+                                    Toyota Corolla (LAG-992)<br><span class="text-green-600">65 km/h</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="absolute bottom-1/3 right-1/3 transform hover:scale-110 transition-transform cursor-pointer">
+                            <div class="relative">
+                                <div class="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white shadow-xl border-2 border-white"><i data-lucide="alert-triangle" class="w-4 h-4"></i></div>
+                                <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg shadow-lg border border-ash text-[10px] font-bold whitespace-nowrap">
+                                    Honda Civic (ABJ-110)<br><span class="text-orange-600">Geo-fence Exit!</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Feed / Ledger -->
+                <div class="bg-white rounded-[2.5rem] border border-ash shadow-md p-6 flex flex-col">
+                    <h3 class="font-bold text-sm uppercase tracking-widest text-ash-secondary mb-4">Activity Feed</h3>
+                    <div class="flex-1 overflow-y-auto custom-scroll space-y-4 pr-2">
+                        <!-- Item 1 -->
+                        <div class="p-4 rounded-2xl bg-ash-base border border-ash">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-xs font-bold text-ash-primary">Payment Received</span>
+                                <span class="text-[9px] text-ash-secondary">2m ago</span>
+                            </div>
+                            <p class="text-sm font-bold text-green-600">₦45,000.00</p>
+                            <p class="text-[10px] text-ash-secondary mt-1">Ref: #TRX-99281 (Escrow)</p>
+                        </div>
+                        <!-- Item 2 -->
+                        <div class="p-4 rounded-2xl bg-ash-base border border-ash">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-xs font-bold text-orange-600">Speed Alert</span>
+                                <span class="text-[9px] text-ash-secondary">15m ago</span>
+                            </div>
+                            <p class="text-xs font-medium text-ash-primary">Vehicle ABJ-110 exceeded 100km/h on Eko Bridge.</p>
+                            <button class="mt-2 text-[10px] font-bold bg-white border border-ash px-2 py-1 rounded hover:bg-red-50 hover:text-red-600 transition-colors">Immobilize</button>
+                        </div>
+                        <!-- Item 3 -->
+                        <div class="p-4 rounded-2xl bg-ash-base border border-ash">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-xs font-bold text-ash-primary">New Booking</span>
+                                <span class="text-[9px] text-ash-secondary">1h ago</span>
+                            </div>
+                            <p class="text-xs font-medium text-ash-primary">Chinedu O. requested Toyota Camry.</p>
+                            <span class="inline-block mt-2 text-[9px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Pending KYC</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // --- GLOBAL: Country List Generation (195 Countries Simulation) ---
+        const countryData = [
+            {name: "Nigeria", code: "+234"}, {name: "United States", code: "+1"}, {name: "United Kingdom", code: "+44"},
+            {name: "Canada", code: "+1"}, {name: "Ghana", code: "+233"}, {name: "South Africa", code: "+27"},
+            {name: "Kenya", code: "+254"}, {name: "India", code: "+91"}, {name: "China", code: "+86"},
+            {name: "Australia", code: "+61"}, {name: "Germany", code: "+49"}, {name: "France", code: "+33"},
+            {name: "Brazil", code: "+55"}, {name: "Mexico", code: "+52"}, {name: "Japan", code: "+81"},
+            {name: "Russia", code: "+7"}, {name: "Italy", code: "+39"}, {name: "Turkey", code: "+90"},
+            {name: "Spain", code: "+34"}, {name: "South Korea", code: "+82"}, {name: "Argentina", code: "+54"},
+            {name: "Netherlands", code: "+31"}, {name: "Saudi Arabia", code: "+966"}, {name: "Switzerland", code: "+41"},
+            {name: "Sweden", code: "+46"}, {name: "Poland", code: "+48"}, {name: "Belgium", code: "+32"},
+            {name: "Thailand", code: "+66"}, {name: "Iran", code: "+98"}, {name: "Indonesia", code: "+62"},
+            {name: "Egypt", code: "+20"}, {name: "Vietnam", code: "+84"}, {name: "Pakistan", code: "+92"},
+            {name: "Bangladesh", code: "+880"}, {name: "Philippines", code: "+63"}, {name: "Ethiopia", code: "+251"},
+            {name: "Morocco", code: "+212"}, {name: "Algeria", code: "+213"}, {name: "Ukraine", code: "+380"},
+            {name: "Colombia", code: "+57"}, {name: "Malaysia", code: "+60"}, {name: "Venezuela", code: "+58"},
+            {name: "Peru", code: "+51"}, {name: "Uzbekistan", code: "+998"}, {name: "Angola", code: "+244"},
+            {name: "Cameroon", code: "+237"}, {name: "Ivory Coast", code: "+225"}, {name: "Senegal", code: "+221"},
+            {name: "UAE", code: "+971"}, {name: "Israel", code: "+972"}, {name: "Portugal", code: "+351"},
+            {name: "Greece", code: "+30"}, {name: "Ireland", code: "+353"}, {name: "New Zealand", code: "+64"}
+            // ... (List truncated for brevity, but logically represents full list)
+        ];
+
+        // Init Country Dropdown
+        const select = document.getElementById('country-selector');
+        select.innerHTML = ""; // Clear loading
+        countryData.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c.code;
+            opt.textContent = `${c.name} (${c.code})`;
+            select.appendChild(opt);
+        });
+
+        // --- UI SWITCHER LOGIC ---
+        function switchInterface(mode) {
+            const user = document.getElementById('user-portal');
+            const admin = document.getElementById('admin-portal');
+            const cust = document.getElementById('customer-portal');
+            const btnU = document.getElementById('btn-switch-user');
+            const btnA = document.getElementById('btn-switch-admin');
+            const btnC = document.getElementById('btn-switch-customer');
+
+            // Reset buttons
+            [btnU, btnA, btnC].forEach(b => {
+                b.classList.remove('bg-ash-sidebar', 'text-white');
+                b.classList.add('text-ash-secondary', 'hover:bg-gray-50');
+            });
+
+            // Activate target
+            if (mode === 'admin') {
+                user.classList.add('hidden');
+                user.classList.remove('flex');
+                cust.classList.add('hidden');
+                admin.classList.remove('hidden');
+                btnA.classList.add('bg-ash-sidebar', 'text-white');
+            } else if (mode === 'customer') {
+                user.classList.add('hidden');
+                user.classList.remove('flex');
+                admin.classList.add('hidden');
+                cust.classList.remove('hidden');
+                btnC.classList.add('bg-ash-sidebar', 'text-white');
+            } else {
+                // User/Renter Mode
+                admin.classList.add('hidden');
+                cust.classList.add('hidden');
+                user.classList.remove('hidden');
+                user.classList.add('flex');
+                btnU.classList.add('bg-ash-sidebar', 'text-white');
+            }
+            lucide.createIcons();
+        }
+
+        // --- CUSTOMER PORTAL LOGIC ---
+        function showCustomerView(viewId) {
+            // Hide all customer views
+            ['register', 'booking', 'success'].forEach(v => {
+                document.getElementById('cust-view-' + v).classList.add('hidden');
+            });
+            // Show target
+            document.getElementById('cust-view-' + viewId).classList.remove('hidden');
+        }
+
+        function selectVehicle(el) {
+            // Reset styles
+            el.parentElement.querySelectorAll('div').forEach(d => {
+                d.classList.remove('border-blue-600', 'bg-blue-50');
+                d.classList.add('border-ash', 'bg-white');
+                d.querySelector('i').classList.remove('text-blue-600');
+                d.querySelector('i').classList.add('text-ash-secondary');
+            });
+            // Set active
+            el.classList.remove('border-ash', 'bg-white');
+            el.classList.add('border-blue-600', 'bg-blue-50');
+            el.querySelector('i').classList.remove('text-ash-secondary');
+            el.querySelector('i').classList.add('text-blue-600');
+        }
+
+        function confirmBooking() {
+            const pickup = document.getElementById('pickup-loc').value;
+            const dropoff = document.getElementById('dropoff-loc').value;
+            
+            if(!dropoff) {
+                alert("Please enter a destination");
+                return;
+            }
+            showCustomerView('success');
+        }
+
+        // --- USER PORTAL LOGIC ---
+        let userStep = 1;
+        let generatedOtp = "";
+
+        function updateCountryCode() {
+            document.getElementById('display-call-code').innerText = document.getElementById('country-selector').value;
+        }
+
+        function handleUserPhone() {
+            const box = document.getElementById('user-otp-box');
+            if (box.classList.contains('hidden')) {
+                generatedOtp = Math.floor(100000 + Math.random() * 900000);
+                box.classList.remove('hidden');
+                document.getElementById('user-otp-hint').innerText = "Dev Mode: " + generatedOtp;
+            } else {
+                const val = document.getElementById('user-otp-input').value;
+                if (val == generatedOtp) {
+                    goToUserStep(2);
+                } else {
+                    alert("Invalid Code");
+                }
+            }
+        }
+
+        function goToUserStep(step) {
+            userStep = step;
+            // Hide all steps
+            for(let i=1; i<=4; i++) document.getElementById(`user-step-${i}`).classList.add('step-hidden');
+            // Show current
+            document.getElementById(`user-step-${step}`).classList.remove('step-hidden');
+            
+            // Update dots
+            for(let i=1; i<=4; i++) {
+                const dot = document.getElementById(`step-${i}-dot`);
+                if(i < step) {
+                    dot.className = "w-8 h-8 rounded-full bg-green-500 text-white flex items-center justify-center text-xs font-bold transition-all";
+                    dot.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i>';
+                } else if (i === step) {
+                    dot.className = "w-8 h-8 rounded-full bg-ash-sidebar text-white flex items-center justify-center text-xs font-bold ring-4 ring-white shadow-sm transition-all";
+                    dot.innerHTML = i;
+                } else {
+                    dot.className = "w-8 h-8 rounded-full bg-white text-ash-secondary border border-ash flex items-center justify-center text-xs font-bold transition-all";
+                    dot.innerHTML = i;
+                }
+            }
+            
+            // Step specific UI logic
+            const statusDiv = document.getElementById('status-idle');
+            const loadingDiv = document.getElementById('status-loading');
+            
+            if(step === 4) {
+                const addr = document.getElementById('user-address').value;
+                document.getElementById('summary-address').innerText = addr || "No Address Provided";
+            }
+
+            lucide.createIcons();
+        }
+
+        function selectDoc(type) {
+            document.querySelectorAll('.doc-btn').forEach(b => {
+                b.classList.remove('bg-ash-sidebar', 'text-white', 'shadow-md');
+                b.classList.add('bg-ash-base', 'text-ash-secondary');
+            });
+            event.target.closest('button').classList.remove('bg-ash-base', 'text-ash-secondary');
+            event.target.closest('button').classList.add('bg-ash-sidebar', 'text-white', 'shadow-md');
+        }
+
+        function handleFileSelected(input) {
+            if(input.files && input.files[0]) {
+                document.getElementById('upload-content').innerHTML = `
+                    <i data-lucide="check-circle" class="w-10 h-10 text-green-500 mx-auto mb-2"></i>
+                    <p class="text-sm font-bold text-ash-primary">${input.files[0].name}</p>
+                `;
+                document.getElementById('doc-next-btn').classList.remove('opacity-50', 'pointer-events-none');
+                lucide.createIcons();
+            }
+        }
+
+        function triggerPayment() {
+            const btn = document.getElementById('btn-pay');
+            btn.innerHTML = `<div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> Processing`;
+            setTimeout(() => {
+                btn.className = "w-full py-5 bg-green-500 text-white rounded-2xl font-bold flex items-center justify-center gap-2";
+                btn.innerHTML = `<i data-lucide="check" class="w-5 h-5"></i> Payment Successful`;
+                lucide.createIcons();
+                alert("Payment Received! The vehicle immobilizer has been deactivated for your booking.");
+            }, 2000);
+        }
+
+        function copyAccount() {
+            navigator.clipboard.writeText("0129485734");
+            alert("Account Copied");
+        }
+
+    </script>
+</body>
+</html>
